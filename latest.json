@@ -3,7 +3,24 @@
   "versionCode": 8,
   "versionName": "0.7.1-preview",
   "mandatory": false,
-  "sha256": "",
-  "parts": [],
-  "notes": "Kanał BartAI-Releases uruchomiony. Wersja przełączająca aplikację na ten kanał zostanie dostarczona jako 0.7.2 Preview."
+  "sha256": "d303b88cc6e4007c6201f4f73f7cce7b5eee06428f6dbca67af6e9a579203bbc",
+  "parts": [
+    "0.7.1/part_00.txt",
+    "0.7.1/part_01.txt",
+    "0.7.1/part_02.txt",
+    "0.7.1/part_03.txt",
+    "0.7.1/part_04.txt",
+    "0.7.1/part_05.txt",
+    "0.7.1/part_06.txt",
+    "0.7.1/part_07.txt",
+    "0.7.1/part_08.txt",
+    "0.7.1/part_09.txt",
+    "0.7.1/part_10.txt",
+    "0.7.1/part_11.txt",
+    "0.7.1/part_12.txt",
+    "0.7.1/part_13.txt",
+    "0.7.1/part_14.txt",
+    "0.7.1/part_15.txt"
+  ],
+  "notes": "BartAI 0.7.1 Preview — sesje jako kompaktowa lista, osobny widok szczegółów, możliwość powrotu/zwiniecia sesji."
 }
