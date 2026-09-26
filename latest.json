@@ -1,0 +1,9 @@
+{
+  "channel": "preview",
+  "versionCode": 8,
+  "versionName": "0.7.1-preview",
+  "mandatory": false,
+  "sha256": "",
+  "parts": [],
+  "notes": "Kanał BartAI-Releases uruchomiony. Wersja przełączająca aplikację na ten kanał zostanie dostarczona jako 0.7.2 Preview."
+}
