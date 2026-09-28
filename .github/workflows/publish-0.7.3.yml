@@ -1,0 +1,80 @@
+name: Publish BartAI 0.7.3
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - ".github/workflows/publish-0.7.3.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout releases repo
+        uses: actions/checkout@v4
+
+      - name: Download built BartAI artifact
+        run: |
+          curl -L --fail --retry 3 'https://sdmntprnortheu.oaiusercontent.com/files/00000000-256c-81f4-a31e-d4c32df3d2d6/raw?se=2026-09-28T23%3A41%3A54Z&sp=r&sv=2026-02-06&sr=b&scid=ccd57fc0-c21c-5b9d-891e-c929b52b3e2d&skoid=8981e47a-681f-4a6a-b86c-73d6347614b7&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-28T20%3A41%3A14Z&ske=2026-09-29T20%3A41%3A14Z&sks=b&skv=2026-02-06&sig=AXQGpCScWO0VlzFdk1kZ3aauFxIdngWR8sKc8qcqqpI%3D' -o artifact.zip
+          unzip -o artifact.zip -d artifact
+          find artifact -type f -maxdepth 3 -print
+
+      - name: Publish update package
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import base64, hashlib, json, math, shutil
+
+          candidates = list(Path("artifact").rglob("*.apk"))
+          if not candidates:
+              raise SystemExit("APK not found in artifact")
+          apk = candidates[0]
+          data = apk.read_bytes()
+
+          version_code = 10
+          version_name = "0.7.3-preview"
+          version_dir = "0.7.3"
+
+          out = Path(version_dir)
+          shutil.rmtree(out, ignore_errors=True)
+          out.mkdir(parents=True, exist_ok=True)
+
+          encoded = base64.b64encode(data).decode("ascii")
+          part_size = 520000
+          parts = []
+
+          for i in range(math.ceil(len(encoded) / part_size)):
+              filename = f"part_{i:02d}.txt"
+              (out / filename).write_text(
+                  encoded[i*part_size:(i+1)*part_size],
+                  encoding="utf-8"
+              )
+              parts.append(f"{version_dir}/{filename}")
+
+          manifest = {
+              "channel": "preview",
+              "versionCode": version_code,
+              "versionName": version_name,
+              "mandatory": False,
+              "sha256": hashlib.sha256(data).hexdigest(),
+              "parts": parts,
+              "notes": "Czytelniejszy widok sesji: statystyki, fragmenty, pełny tekst, kopiowanie i ukryta edycja."
+          }
+
+          Path("latest.json").write_text(
+              json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8"
+          )
+          print(json.dumps(manifest, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Commit public update
+        run: |
+          git config user.name "BartAI Build Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add 0.7.3 latest.json
+          git commit -m "Publish BartAI 0.7.3" || exit 0
+          git push
